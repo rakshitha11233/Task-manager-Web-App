@@ -1,0 +1,12 @@
+model\Task.class
+servlet\LogoutServlet.class
+servlet\LoginServlet.class
+servlet\TaskServlet.class
+DAO\TaskDAO.class
+DAO\database.class
+util\JsonUtil$2.class
+servlet\RegisterServlet.class
+util\JsonUtil.class
+DAO\UserDAO.class
+model\User.class
+util\JsonUtil$1.class
