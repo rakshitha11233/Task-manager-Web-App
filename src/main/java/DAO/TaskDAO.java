@@ -1,12 +1,17 @@
 package DAO;
 
-import model.Task;
-import util.DatabaseUtil;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import model.Task;
+import util.DatabaseUtil;
 
 public class TaskDAO {
 
@@ -122,4 +127,16 @@ public class TaskDAO {
         t.setCompleted(rs.getBoolean("completed"));
         return t;
     }
+    public static boolean toggleTask(String owner, long id) {
+    String sql = "UPDATE tasks SET completed = NOT completed WHERE owner=? AND id=?";
+    try (Connection conn = DatabaseUtil.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, owner);
+        ps.setLong(2, id);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }

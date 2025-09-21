@@ -36,13 +36,15 @@ protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws S
     if (username == null) return;
 
     String action = req.getParameter("action");
-    if ("toggle".equalsIgnoreCase(action)) {
-        long id = Long.parseLong(req.getParameter("id"));
-        TaskDAO.getById(username, id).ifPresent(t -> t.setCompleted(!t.isCompleted()));
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().write("{\"message\":\"toggled\"}");
-        return;
-    }
+    if ("toggle".equals(action)) {
+    String owner = (String) req.getSession().getAttribute("username"); 
+    long id = Long.parseLong(req.getParameter("id"));
+    boolean ok = TaskDAO.toggleTask(owner, id);
+
+    resp.setContentType("application/json");
+    resp.getWriter().write("{\"success\":" + ok + "}");
+    return;
+}
 
     Task t = JsonUtil.GSON.fromJson(req.getReader(), Task.class);
     if (t.getTitle() == null) {
