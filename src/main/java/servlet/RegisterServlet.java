@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import DAO.UserDAO;
 import model.User;
@@ -24,14 +25,17 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         UserDAO userDAO = new UserDAO();
-        boolean added = userDAO.addUser(user);
-        if (!added) {
-            resp.setStatus(HttpServletResponse.SC_CONFLICT);
-            resp.getWriter().write("{\"error\":\"user exists\"}");
-            return;
-        }
-        resp.setStatus(HttpServletResponse.SC_CREATED);
-        resp.getWriter().write(JsonUtil.GSON.toJson(user));
+boolean added = userDAO.addUser(user);
+if (added) {
+    HttpSession session = req.getSession(true);
+    session.setAttribute("username", user.getUsername());
+    resp.setStatus(HttpServletResponse.SC_CREATED);
+    resp.getWriter().write(JsonUtil.GSON.toJson(user));
+} else {
+    resp.setStatus(HttpServletResponse.SC_CONFLICT);
+    resp.getWriter().write("{\"error\":\"user exists\"}");
+}
+
     }
 }
 

@@ -1,8 +1,11 @@
 model\Task.class
 servlet\LogoutServlet.class
+util\SchemaInitializer.class
+util\AppStartupListener.class
 servlet\LoginServlet.class
 servlet\TaskServlet.class
 DAO\TaskDAO.class
+util\DatabaseUtil.class
 DAO\database.class
 util\JsonUtil$2.class
 servlet\RegisterServlet.class

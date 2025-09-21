@@ -5,7 +5,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>RegisterServlet</servlet-name>
-    <url-pattern>/api/register</url-pattern>
+    <url-pattern>/taskwebapp/api/register</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -14,7 +14,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/api/login</url-pattern>
+    <url-pattern>/taskwebapp/api/login</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -23,7 +23,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>LogoutServlet</servlet-name>
-    <url-pattern>/api/logout</url-pattern>
+    <url-pattern>/taskwebapp/api/logout</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -32,6 +32,21 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>TaskServlet</servlet-name>
-    <url-pattern>/api/tasks</url-pattern>
+    <url-pattern>/taskwebapp/api/tasks</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>H2Console</servlet-name>
+    <servlet-class>org.h2.server.web.WebServlet</servlet-class>
+    <init-param>
+        <param-name>-webAllowOthers</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>H2Console</servlet-name>
+    <url-pattern>/h2-console/*</url-pattern>
+</servlet-mapping>
+
 </web-app>

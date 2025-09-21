@@ -16,46 +16,47 @@ import util.JsonUtil;
 
 public class TaskServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username = getUsernameFromSession(req, resp);
-        if (username == null) return;
+protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String username = getUsernameFromSession(req, resp);
+    if (username == null) return;  // stop if not logged in
 
-        String filter = req.getParameter("filter");
-        List<Task> list;
-        if ("completed".equalsIgnoreCase(filter)) list = TaskDAO.filterByStatus(username, true);
-        else if ("pending".equalsIgnoreCase(filter)) list = TaskDAO.filterByStatus(username, false);
-        else list = TaskDAO.getAll(username);
+    String filter = req.getParameter("filter");
+    List<Task> list;
+    if ("completed".equalsIgnoreCase(filter)) list = TaskDAO.filterByStatus(username, true);
+    else if ("pending".equalsIgnoreCase(filter)) list = TaskDAO.filterByStatus(username, false);
+    else list = TaskDAO.getAll(username);  // only tasks for this user
 
+    resp.setStatus(HttpServletResponse.SC_OK);
+    resp.getWriter().write(JsonUtil.GSON.toJson(list));
+}
+
+@Override
+protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String username = getUsernameFromSession(req, resp);
+    if (username == null) return;
+
+    String action = req.getParameter("action");
+    if ("toggle".equalsIgnoreCase(action)) {
+        long id = Long.parseLong(req.getParameter("id"));
+        TaskDAO.getById(username, id).ifPresent(t -> t.setCompleted(!t.isCompleted()));
         resp.setStatus(HttpServletResponse.SC_OK);
-        resp.getWriter().write(JsonUtil.GSON.toJson(list));
+        resp.getWriter().write("{\"message\":\"toggled\"}");
+        return;
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String username = getUsernameFromSession(req, resp);
-        if (username == null) return;
-
-        String action = req.getParameter("action");
-        if ("toggle".equalsIgnoreCase(action)) {
-            long id = Long.parseLong(req.getParameter("id"));
-            TaskDAO.getById(username, id).ifPresent(t -> t.setCompleted(!t.isCompleted()));
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.getWriter().write("{\"message\":\"toggled\"}");
-            return;
-        }
-
-        Task t = JsonUtil.GSON.fromJson(req.getReader(), Task.class);
-        if (t.getTitle() == null) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{\"error\":\"title required\"}");
-            return;
-        }
-        if (t.getDueDate() == null) t.setDueDate(LocalDate.now());
-
-        Task created = TaskDAO.createTask(username, t);
-        resp.setStatus(HttpServletResponse.SC_CREATED);
-        resp.getWriter().write(JsonUtil.GSON.toJson(created));
+    Task t = JsonUtil.GSON.fromJson(req.getReader(), Task.class);
+    if (t.getTitle() == null) {
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        resp.getWriter().write("{\"error\":\"title required\"}");
+        return;
     }
+    if (t.getDueDate() == null) t.setDueDate(LocalDate.now());
+
+    Task created = TaskDAO.createTask(username, t);  // use session username
+    resp.setStatus(HttpServletResponse.SC_CREATED);
+    resp.getWriter().write(JsonUtil.GSON.toJson(created));
+}
+
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
